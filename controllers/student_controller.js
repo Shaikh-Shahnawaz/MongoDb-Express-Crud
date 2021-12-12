@@ -1,10 +1,9 @@
 const student_master = require("../models/studentsModel");
 
-
 // =========================================[ find ]=========================================
 
 exports.getStudentsData = async (req, res) => {
-    try {
+  try {
     const data = await student_master.find();
     res.json({ mesage: "Data Fetched", data: data });
   } catch (error) {
@@ -25,6 +24,7 @@ exports.getStudentsData = async (req, res) => {
 // =========================================[ create, insertMany ]=========================================
 
 exports.insertOneStudent = async (req, res) => {
+  // console.log(req.body)
   try {
     const data = await student_master.create(req.body);
 
@@ -47,39 +47,47 @@ exports.insertManyStudent = async (req, res) => {
 // update
 // updateOne
 
-exports.updateStudentById = async (req, res) => {
+exports.updateStudentByParamsId = async (req, res) => {
+
   try {
-    const updateAllField = {
-      first_name: req.body.first_name,
-      last_name: req.body.last_name,
-      field_of_study: req.body.field_of_study,
-      age: req.body.age,
-    };
+  
+    // createing dynamic query for update student
+
+    const query = {};
+    for (i in req.body) {
+      // console.log('for in loop',req.body[i],i)
+      if (req.body[i]) {
+        query[i] = req.body[i];
+      }
+    }
+
     const data = await student_master.updateOne(
-      { _id: req.body._id },
-      { $set: updateAllField }
+      { _id: req.params.id },
+      { $set: query }
     );
     res.json({ message: "Student Data Updated", data: data });
-} catch (error) {
+  } catch (error) {
     throw new Error(error);
-}
+  }
 };
-// exports.updateAllStudent = async(req,res)=>{
-    //     try{
-        //         const data = await student_master.updateMany({_id:req.body._id},{$set:{first_name:req.body.first_name}})
-//         res.json({ message: "Student Updated", data: data });
-//     }
-//     catch (error) {
-    //         throw new Error(error);
-    //       }
-    // }
-    
 
 // =========================================[ deleteOne ]=========================================
 
+// getting the id in body
 exports.deleteStudentById = async (req, res) => {
+  console.log(req.body.id, req.method);
   try {
-    const data = await student_master.deleteOne({_id:req.body._id})
+    const data = await student_master.deleteOne({ _id: req.body.id });
+    res.json({ message: "Student Data Deleted", data: data });
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+/// getting the id in params
+exports.deleteStudentByParamsId = async (req, res) => {
+  try {
+    const data = await student_master.deleteOne({ _id: req.params.id });
     res.json({ message: "Student Data Deleted", data: data });
   } catch (error) {
     throw new Error(error);

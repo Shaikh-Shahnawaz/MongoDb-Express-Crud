@@ -1,4 +1,5 @@
 const express = require("express")
+const bodyParser = require('body-parser')
 require('dotenv').config()
 const cors = require('cors')
 const studentRoute = require("./routes/student_routes")
@@ -11,10 +12,10 @@ const app = express()
 //app level middleware
 app.use(cors())
 app.use(express.json())
-app.use(express.urlencoded({extended:true}))
+app.use(express.urlencoded({extended:false}))
 
 //chekc for proper data
-app.use(checkForProperData)
+// app.use(checkForProperData)
 
 // routes middleware
 app.use("/api/students",studentRoute)

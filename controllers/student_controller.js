@@ -4,8 +4,21 @@ const student_master = require("../models/studentsModel");
 
 exports.getStudentsData = async (req, res) => {
   try {
-    const data = await student_master.find();
-    res.json({ mesage: "Data Fetched", data: data });
+    // skip and limit for pagination
+    /*const data = await student_master.find()
+    .skip(req.body.page * req.body.limit)
+    .limit(req.body.limit)*/
+    
+    // taking count of all data
+    /* const count = await student_master.find().count()*/
+
+    // to handle multiple await simultaneously we use PROMISE ALL
+    const data = await Promise.all([
+      student_master.find().skip(req.body.page * req.body.limit).limit(req.body.limit),
+      student_master.find().count()
+    ])
+
+    res.json({ mesage: "Data Fetched", data: data[0],totalCount:data[1] });
   } catch (error) {
     throw new Error(error);
   }
@@ -47,8 +60,9 @@ exports.insertManyStudent = async (req, res) => {
 // update
 // updateOne
 
-exports.updateStudentByParamsId = async (req, res) => {
+exports.updateStudentById = async (req, res) => {
 
+  // console.log(req.body)
   try {
   
     // createing dynamic query for update student
@@ -62,7 +76,7 @@ exports.updateStudentByParamsId = async (req, res) => {
     }
 
     const data = await student_master.updateOne(
-      { _id: req.params.id },
+      { _id: req.body.id },
       { $set: query }
     );
     res.json({ message: "Student Data Updated", data: data });
@@ -85,11 +99,11 @@ exports.deleteStudentById = async (req, res) => {
 };
 
 /// getting the id in params
-exports.deleteStudentByParamsId = async (req, res) => {
-  try {
-    const data = await student_master.deleteOne({ _id: req.params.id });
-    res.json({ message: "Student Data Deleted", data: data });
-  } catch (error) {
-    throw new Error(error);
-  }
-};
+// exports.deleteStudentByParamsId = async (req, res) => {
+//   try {
+//     const data = await student_master.deleteOne({ _id: req.params.id });
+//     res.json({ message: "Student Data Deleted", data: data });
+//   } catch (error) {
+//     throw new Error(error);
+//   }
+// };
